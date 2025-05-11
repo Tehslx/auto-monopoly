@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=1030,initial-scale=1,viewport-fit=cover">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/design.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/index.css') }}">
+        <link href="{{ url_for('static', filename='logo/logo_50_gray.png') }}" rel="shortcut icon" type="image/png">
+        <link href="{{ url_for('static', filename='logo/logo_150_pad.png') }}" rel="apple-touch-icon">
+        <link href="{{ url_for('static', filename='logo/logo.svg') }}" rel="mask-icon" color="#656d78">
+        <link href="{{ url_for('static', filename='logo/logo_150_pad.png') }}" rel="apple-touch-icon-precomposed">
+        <meta name="description" content="Играйте без рук в лучшую Монополию онлайн, побеждайте соперников и станьте чемпионом!">
+        <meta name="keywords" content="монополия,играть,онлайн,auto,monopoly,настольная,настолка,друзья,бот,боты,автоматическая,турнир,чемпион">
+        <meta property="og:image" content="{{ url_for('static', filename='logo/logo_700_pad.png') }}">
+        <title>Статус системы M1</title>
+    </head>
+    <body>
+        <div class="block header">
+            <div class="widther">
+                <a href="{{ url_for('index') }}" class="header-logo">
+                    <svg viewBox="0 0 500 500" height="30" width="30">
+                        <path d="M111.02 54.95c4.73-13.92 9.11-27.95 14.08-41.78 3.08 1.26 3.81 4.76 5.31 7.4 38.74 77.58 77.54 155.14 116.27 232.73.86 1.78 2.05 3.36 3.32 4.87 2.01-2.22 3.41-4.88 4.68-7.57 37.95-76 75.92-151.99 113.91-227.98 1.71-3.22 2.92-6.79 5.43-9.51 1.39 1.11 1.97 2.82 2.53 4.44 34.23 103.05 68.61 206.05 102.93 309.07 5.05 16.14 10.48 32.16 15.84 48.2 1.01 2.98 2.25 5.88 3.52 8.75-19.49 9.8-38.37 20.78-56.62 32.72-15.73 10.23-30.62 21.73-44.4 34.46-1.24-1.39-2.24-2.98-2.56-4.83-11.77-46.96-23.67-93.89-35.48-140.85-2.07-7.48-3.4-15.19-6.05-22.5-1.04.95-2.09 1.93-2.7 3.23-31.46 62.95-62.9 125.93-94.38 188.88-1.91 3.59-3.35 7.48-5.76 10.78-2.15.77-2.79-1.58-3.66-2.99-31.75-63.53-63.47-127.07-95.23-190.6-1.57-3.01-2.78-6.27-4.94-8.93-1.64.51-1.77 2.38-2.24 3.76-12.92 51.67-26.07 103.28-39 154.95-.85 3.15-1.23 6.67-3.63 9.12-25.28-23.66-54.86-42.1-85-58.87-5.29-3.06-11.04-5.28-16.1-8.74 8.9-25.05 16.84-50.44 25.44-75.61 7.67-20.98 14.28-42.32 21.49-63.46 21-63.05 42.05-126.08 63-189.14z"></path>
+                    </svg>
+                    <div>Monopoly Auto</div>
+                </a>
+                {% if show_api_status %}
+                <div class="header-menu header-fidgame">
+                    <a href="{{ url_for('health') }}" class="header-menu-one">Статус API&nbsp;
+                        {% if total.delay %}
+                            {% if total.delay <= 100 %}
+                                {% set color = "var(--color-grass)" %}
+                            {% elif total.delay <= 200 %}
+                                {% set color = "var(--color-sunflower)" %}
+                            {% else %}
+                                {% set color = "var(--color-grapefruit)" %}
+                            {% endif %}
+                        <div style="color: {{ color }};">
+                            <span style="opacity:.5;font-size:75%;">{{ total.delay }}мс</span>
+                        </div>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </a>
+                </div>
+                {% endif %}                
+                <div class="header-menu"></div>
+                <div class="header-auth">
+                    {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin %}
+                    <div class="header-menu header-fidgame">
+                        <a href="{{ url_for('admin') }}" class="header-menu-one">Админка
+                            {% if pending_total > 0 %}
+                            <span class="badge">{{ pending_total }}</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                    {% endif %}
+                    <div class="header-menu header-fidgame">
+                        <a href="{{ url_for('profile', id=current_user.id) }}" class="header-menu-one">Профиль</a>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="button button-grass">Выйти</a>
+                    {% else %}
+                    <a href="{{ url_for('auth') }}" class="button button-grass">Войти</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class='widther2 container statusHealth' style="padding-bottom: 25px;">
+            <div class=col-3>
+                <div class=block>
+                    <div class='title title-4'>Аптайм API</div>
+                    <div class='title title-1' style="margin-top:-10px" id="uptime">
+                        {% if total.uptime %}
+                            {{ "%.0f"|format(total.uptime * 100) }}<span style="opacity:.5;font-size:75%;">%</span>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                    <div class='title title-4'>Время ответа API</div>
+                    <div class='title title-1' style="margin-top:-10px" id="performance">
+                        {% if total.delay %}
+                            {{ total.delay }} <span style="opacity:.5;font-size:75%;">мс</span>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class=col-9>
+                <div class='block statusHealth-sections'>
+                    <div class='title title-2'>Статус API M1</div>
+                    <div class='fullwidth list statusHealth-sections-table'>
+                        <div class='list-one statusHealth-sections-table-head'>
+                            <div>Раздел сайта</div>
+                            <div>Аптайм раздела</div>
+                            <div>Время ответа</div>
+                        </div>
+                        {% set section_order = [
+                            "users", "rooms", "friends", "inventory", "trades", "market",
+                            "gchat", "im", "wallet", "games", "seasonpass", "data"
+                        ] %}
+                        {% set section_names = {
+                            "users": "Пользователи",
+                            "rooms": "Поиск игр",
+                            "friends": "Друзья",
+                            "inventory": "Инвентари",
+                            "trades": "Обмены",
+                            "market": "Маркет",
+                            "gchat": "Общий чат",
+                            "im": "Мессенджер",
+                            "wallet": "Кошелёк",
+                            "games": "Игры",
+                            "seasonpass": "Сезонный пропуск",
+                            "data": "Данные"
+                        } %}
+                        {% for section_key in section_order %}
+                            {% set section_data = sections.get(section_key, {}) %}
+                            {% set section_name = section_names.get(section_key, section_key) %}
+                            {% set uptime = section_data.uptime if section_data.uptime is defined else -1 %}
+                            {% set delay = section_data.delay if section_data.delay is defined else None %}
+                            {% set is_available = uptime >= 0 %}
+                            <div class='list-one statusHealth-sections-table-row'>
+                                <div>{{ section_name }}</div>
+                            
+                                {% if is_available %}
+                                    {% if uptime >= 0.975 %}
+                                        {% set color = "var(--color-grass)" %}
+                                    {% elif uptime >= 0.9 %}
+                                        {% set color = "var(--color-sunflower)" %}
+                                    {% elif 0.9 <= utime %}
+                                        {% set color = "var(--color-sunfloer)" %}
+                                    {% else %}
+                                        {% set color = "var(--color-grapefruit)" %}
+                                    {% endif %}
+                                    <div style="font-weight: 600; color: {{ color }};">
+                                        {{ (uptime * 100)|round|int }}<span>%</span>
+                                    </div>
+                                {% else %}
+                                    <div style="opacity: 0.5;">N/A</div>
+                                {% endif %}
+                            
+                                {% if is_available %}
+                                    <div>{{ delay }} <span>мс</span></div>
+                                {% else %}
+                                    <div style="opacity: 0.5;">N/A</div>
+                                {% endif %}
+                            </div>                            
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
